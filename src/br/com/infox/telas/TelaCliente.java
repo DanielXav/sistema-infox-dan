@@ -83,7 +83,7 @@ public class TelaCliente extends javax.swing.JInternalFrame {
             pst = conexao.prepareStatement(sql);
             pst.setString(1, txtCliPesquisar.getText() + "%");
             rs = pst.executeQuery();
-            
+
             tbtClientes.setModel(DbUtils.resultSetToTableModel(rs));
         } catch (Exception e) {
             JOptionPane.showMessageDialog(null, e);
@@ -91,8 +91,9 @@ public class TelaCliente extends javax.swing.JInternalFrame {
     }
 
     // Método para setar os campos do fórmulario com o conteudo da tabela7
-    public void setar_campos(){
+    public void setar_campos() {
         int setar = tbtClientes.getSelectedRow();
+        txtCliId.setText(tbtClientes.getModel().getValueAt(setar, 0).toString());
         txtCliNome.setText(tbtClientes.getModel().getValueAt(setar, 1).toString());
         txtCliCPF.setText(tbtClientes.getModel().getValueAt(setar, 2).toString());
         txtCliCelular.setText(tbtClientes.getModel().getValueAt(setar, 3).toString());
@@ -106,7 +107,92 @@ public class TelaCliente extends javax.swing.JInternalFrame {
         txtCliComplemento.setText(tbtClientes.getModel().getValueAt(setar, 11).toString());
         txtCliCEP.setText(tbtClientes.getModel().getValueAt(setar, 12).toString());
         
+        btnAdicionar.setEnabled(false);
     }
+
+    // Alterar campo dos clientess
+     private void alterar() {
+        String sql = "update tbclientes set nomecli = ?, cpf = ?, cellcli = ?, fonecli = ?, emailcli = ?, numrescli = ?, ruacli = ?, bairrocli = ?, cidadecli = ?, estadocli = ?, complementocli = ?, cepcli = ? where idcli = ?";
+
+        try {
+            pst = conexao.prepareStatement(sql);
+            pst.setString(1, txtCliNome.getText());
+            pst.setString(2, txtCliCPF.getText());
+            pst.setString(3, txtCliCelular.getText());
+            pst.setString(4, txtCliTelefone.getText());
+            pst.setString(5, txtCliEmail.getText());
+            pst.setString(6, txtCliNumAp.getText());
+            pst.setString(7, txtCliRua.getText());
+            pst.setString(8, txtCliBairro.getText());
+            pst.setString(9, txtCliCidade.getText());
+            pst.setString(10, txtCliEstado.getText());
+            pst.setString(11, txtCliComplemento.getText());
+            pst.setString(12, txtCliCEP.getText());
+            pst.setString(13, txtCliId.getText());
+
+            if (txtCliNome.getText().isEmpty() || txtCliCPF.getText().isEmpty() || txtCliId.getText().isEmpty()) {
+                JOptionPane.showMessageDialog(null, "Preencha todos os dados obrigatórios");
+            } else {
+                // Atualiza a tabela usuario com os dados do formulário
+                int adicionado = pst.executeUpdate();
+
+                if (adicionado > 0) {
+                    JOptionPane.showMessageDialog(null, "Dados do cliente alterados com sucesso");
+                    txtCliNome.setText(null);
+                    txtCliCPF.setText(null);
+                    txtCliId.setText(null);
+                    txtCliCelular.setText(null);
+                    txtCliTelefone.setText(null);
+                    txtCliEmail.setText(null);
+                    txtCliNumAp.setText(null);
+                    txtCliRua.setText(null);
+                    txtCliBairro.setText(null);
+                    txtCliCidade.setText(null);
+                    txtCliEstado.setText(null);
+                    txtCliComplemento.setText(null);
+                    txtCliCEP.setText(null);
+                    btnAdicionar.setEnabled(true);
+                }
+            }
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(null, e);
+        }
+    }
+    // Método excluir
+
+    private void remover() {
+        int confirma = JOptionPane.showConfirmDialog(null, "Tem certeza que deseja remover este cliente?", "Atenção", JOptionPane.YES_NO_OPTION);
+        if (confirma == JOptionPane.YES_OPTION) {
+            String sql = "delete from tbclientes where idcli=?";
+            try {
+                pst = conexao.prepareStatement(sql);
+                pst.setString(1, txtCliId.getText());
+                int apagado = pst.executeUpdate();
+
+                if (apagado > 0) {
+                    JOptionPane.showMessageDialog(null, "Cliente removido com sucesso!");
+                    txtCliNome.setText(null);
+                    txtCliCPF.setText(null);
+                    txtCliId.setText(null);
+                    txtCliCelular.setText(null);
+                    txtCliTelefone.setText(null);
+                    txtCliEmail.setText(null);
+                    txtCliNumAp.setText(null);
+                    txtCliRua.setText(null);
+                    txtCliBairro.setText(null);
+                    txtCliCidade.setText(null);
+                    txtCliEstado.setText(null);
+                    txtCliComplemento.setText(null);
+                    txtCliCEP.setText(null);
+                    btnAdicionar.setEnabled(true);
+                }
+
+            } catch (Exception e) {
+                JOptionPane.showMessageDialog(null, e);
+            }
+        }
+    }
+
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
@@ -130,7 +216,7 @@ public class TelaCliente extends javax.swing.JInternalFrame {
         jLabel13 = new javax.swing.JLabel();
         txtCliNome = new javax.swing.JTextField();
         txtCliCPF = new javax.swing.JTextField();
-        txtCliCelular = new javax.swing.JTextField();
+        txtCliId = new javax.swing.JTextField();
         txtCliEmail = new javax.swing.JTextField();
         txtCliEstado = new javax.swing.JTextField();
         txtCliRua = new javax.swing.JTextField();
@@ -149,6 +235,8 @@ public class TelaCliente extends javax.swing.JInternalFrame {
         jLabel14 = new javax.swing.JLabel();
         jLabel8 = new javax.swing.JLabel();
         jLabel15 = new javax.swing.JLabel();
+        jLabel16 = new javax.swing.JLabel();
+        txtCliCelular = new javax.swing.JTextField();
 
         setClosable(true);
         setIconifiable(true);
@@ -187,22 +275,24 @@ public class TelaCliente extends javax.swing.JInternalFrame {
         getContentPane().add(jLabel11, new org.netbeans.lib.awtextra.AbsoluteConstraints(19, 221, -1, -1));
 
         jLabel12.setText("Complemento");
-        getContentPane().add(jLabel12, new org.netbeans.lib.awtextra.AbsoluteConstraints(30, 280, 90, -1));
+        getContentPane().add(jLabel12, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 280, 90, -1));
 
         jLabel13.setText("CEP");
-        getContentPane().add(jLabel13, new org.netbeans.lib.awtextra.AbsoluteConstraints(270, 280, -1, -1));
+        getContentPane().add(jLabel13, new org.netbeans.lib.awtextra.AbsoluteConstraints(210, 280, -1, -1));
         getContentPane().add(txtCliNome, new org.netbeans.lib.awtextra.AbsoluteConstraints(54, 145, 302, -1));
         getContentPane().add(txtCliCPF, new org.netbeans.lib.awtextra.AbsoluteConstraints(414, 145, 135, -1));
-        getContentPane().add(txtCliCelular, new org.netbeans.lib.awtextra.AbsoluteConstraints(56, 180, 108, -1));
+
+        txtCliId.setEnabled(false);
+        getContentPane().add(txtCliId, new org.netbeans.lib.awtextra.AbsoluteConstraints(420, 280, 100, -1));
         getContentPane().add(txtCliEmail, new org.netbeans.lib.awtextra.AbsoluteConstraints(414, 180, 135, -1));
         getContentPane().add(txtCliEstado, new org.netbeans.lib.awtextra.AbsoluteConstraints(56, 218, 108, -1));
         getContentPane().add(txtCliRua, new org.netbeans.lib.awtextra.AbsoluteConstraints(56, 249, 300, -1));
-        getContentPane().add(txtCliComplemento, new org.netbeans.lib.awtextra.AbsoluteConstraints(100, 280, 130, -1));
+        getContentPane().add(txtCliComplemento, new org.netbeans.lib.awtextra.AbsoluteConstraints(70, 280, 130, -1));
         getContentPane().add(txtCliCidade, new org.netbeans.lib.awtextra.AbsoluteConstraints(220, 218, 136, -1));
         getContentPane().add(txtCliTelefone, new org.netbeans.lib.awtextra.AbsoluteConstraints(220, 180, 136, -1));
         getContentPane().add(txtCliBairro, new org.netbeans.lib.awtextra.AbsoluteConstraints(414, 218, 135, -1));
         getContentPane().add(txtCliNumAp, new org.netbeans.lib.awtextra.AbsoluteConstraints(420, 250, 30, -1));
-        getContentPane().add(txtCliCEP, new org.netbeans.lib.awtextra.AbsoluteConstraints(300, 280, 129, -1));
+        getContentPane().add(txtCliCEP, new org.netbeans.lib.awtextra.AbsoluteConstraints(230, 280, 129, -1));
 
         btnAdicionar.setIcon(new javax.swing.ImageIcon(getClass().getResource("/br/com/infox/icones/create.png"))); // NOI18N
         btnAdicionar.addActionListener(new java.awt.event.ActionListener() {
@@ -213,9 +303,19 @@ public class TelaCliente extends javax.swing.JInternalFrame {
         getContentPane().add(btnAdicionar, new org.netbeans.lib.awtextra.AbsoluteConstraints(69, 318, 123, 119));
 
         btnAtualizar.setIcon(new javax.swing.ImageIcon(getClass().getResource("/br/com/infox/icones/update.png"))); // NOI18N
+        btnAtualizar.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnAtualizarActionPerformed(evt);
+            }
+        });
         getContentPane().add(btnAtualizar, new org.netbeans.lib.awtextra.AbsoluteConstraints(224, 318, 121, 119));
 
         btnRemover.setIcon(new javax.swing.ImageIcon(getClass().getResource("/br/com/infox/icones/delete.png"))); // NOI18N
+        btnRemover.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnRemoverActionPerformed(evt);
+            }
+        });
         getContentPane().add(btnRemover, new org.netbeans.lib.awtextra.AbsoluteConstraints(370, 320, 113, 119));
 
         txtCliPesquisar.addKeyListener(new java.awt.event.KeyAdapter() {
@@ -252,6 +352,10 @@ public class TelaCliente extends javax.swing.JInternalFrame {
         jLabel15.setIcon(new javax.swing.ImageIcon(getClass().getResource("/br/com/infox/icones/read-cli.png"))); // NOI18N
         getContentPane().add(jLabel15, new org.netbeans.lib.awtextra.AbsoluteConstraints(260, 10, -1, 20));
 
+        jLabel16.setText("Id Cliente");
+        getContentPane().add(jLabel16, new org.netbeans.lib.awtextra.AbsoluteConstraints(370, 280, -1, -1));
+        getContentPane().add(txtCliCelular, new org.netbeans.lib.awtextra.AbsoluteConstraints(56, 180, 108, -1));
+
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
@@ -270,6 +374,16 @@ public class TelaCliente extends javax.swing.JInternalFrame {
         setar_campos();
     }//GEN-LAST:event_tbtClientesMouseClicked
 
+    private void btnAtualizarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnAtualizarActionPerformed
+        // Método para alterar clientes
+        alterar();
+    }//GEN-LAST:event_btnAtualizarActionPerformed
+
+    private void btnRemoverActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnRemoverActionPerformed
+        // Método para remover
+        remover();
+    }//GEN-LAST:event_btnRemoverActionPerformed
+
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnAdicionar;
@@ -282,6 +396,7 @@ public class TelaCliente extends javax.swing.JInternalFrame {
     private javax.swing.JLabel jLabel13;
     private javax.swing.JLabel jLabel14;
     private javax.swing.JLabel jLabel15;
+    private javax.swing.JLabel jLabel16;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel jLabel4;
@@ -300,6 +415,7 @@ public class TelaCliente extends javax.swing.JInternalFrame {
     private javax.swing.JTextField txtCliComplemento;
     private javax.swing.JTextField txtCliEmail;
     private javax.swing.JTextField txtCliEstado;
+    private javax.swing.JTextField txtCliId;
     private javax.swing.JTextField txtCliNome;
     private javax.swing.JTextField txtCliNumAp;
     private javax.swing.JTextField txtCliPesquisar;
